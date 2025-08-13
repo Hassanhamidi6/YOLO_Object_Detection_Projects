@@ -4,7 +4,7 @@ import cvzone
 import math
 from sort import *
 
-cap = cv2.VideoCapture("Videos/cars.mp4")
+cap = cv2.VideoCapture("Videos/person.mp4")
 
 # using  the YOLOv8 model
 model = YOLO("../Yolo-weights/Yolov8n.pt")
@@ -16,12 +16,13 @@ cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 344)
 # SORT tracker
 tracker = Sort(max_age=20, min_hits=3, iou_threshold=0.3)
 
-# Vehicle count tracking
-total_count = 0
-counted_ids = set()
-
 # Line for counting the vehicles
-limits = [0, 500, 1366, 500]  # (x1, y1, x2, y2)
+limitsUp = [0, 600, 320, 600]  # (x1, y1, x2, y2)
+limitsDown = [350, 200, 650, 200]  
+
+# Vehicle count tracking
+total_countUp = []
+total_countDown = []
 
 # Class names from COCO dataset
 classNames = [
@@ -62,7 +63,7 @@ while True:
             current_class = classNames[cls]
 
             # Filter for vehicles
-            if current_class in ["car", "truck", "motorbike", "bus"] and conf > 0.3:
+            if current_class == "person" and conf > 0.3:
                 cvzone.cornerRect(img, (x1, y1, x2 - x1, y2 - y1), l=9, rt=2, colorR=(255, 0, 255))
                 # cvzone.putTextRect(img, f"{current_class} {conf}", (max(0, x1), max(35, y1)),
                 #                    scale=0.8, thickness=1, offset=3)
@@ -74,7 +75,8 @@ while True:
     results_tracker = tracker.update(detections)
 
     # Draw tracking and counting
-    cv2.line(img, (limits[0], limits[1]), (limits[2], limits[3]), (0, 0, 255), 5)
+    cv2.line(img, (limitsUp[0], limitsUp[1]), (limitsUp[2], limitsUp[3]), (0, 0, 255), 5)
+    cv2.line(img, (limitsDown[0], limitsDown[1]), (limitsDown[2], limitsDown[3]), (0, 0, 255), 5)
 
     for result in results_tracker:
         x1, y1, x2, y2, id = map(int, result)
@@ -83,14 +85,13 @@ while True:
         cvzone.putTextRect(img, f"{current_class} {id}", (x1, y1), scale=0.8, thickness=1, offset=3)
         cv2.circle(img, (cx, cy), 5, (255, 0, 255), cv2.FILLED)
 
-        if limits[0] < cx < limits[2] and limits[1] - 20 < cy < limits[3] + 20:
-            if id not in counted_ids:
-                counted_ids.add(id)
-                total_count += 1
-                cv2.line(img, (limits[0], limits[1]), (limits[2], limits[3]), (0, 255, 0), 5)
+        if limitsUp[0] < cx < limitsUp[2] and limitsUp[1] - 20 < cy < limitsUp[3] + 20:
+            if total_countUp.count(id)==0:
+                total_countUp.append(id)
+                cv2.line(img, (limitsUp[0], limitsUp[1]), (limitsUp[2], limitsUp[3]), (0, 255, 0), 5)
 
     # Display total count
-    cvzone.putTextRect(img, f"Count: {total_count}", (50, 50), scale=1, thickness=2, offset=5)
+    cvzone.putTextRect(img, f"Count: {total_countUp}", (50, 50), scale=1, thickness=2, offset=5)
 
     cv2.imshow("Image", img)
     if cv2.waitKey(1) & 0xFF == ord('q'):
