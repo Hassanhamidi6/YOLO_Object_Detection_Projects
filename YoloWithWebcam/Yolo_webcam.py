@@ -43,11 +43,9 @@ while True:
             cls = int(box.cls[0])
             current_class= classNames[cls]
 
-
-            if current_class == "car" or current_class == "Truck" or current_class == "motorbike":
-                # Here we are giving the name and confidence to the object  
-                cvzone.putTextRect(img, f"{current_class} {conf}", (max(0,x1), max(35,y1)),
-                                scale=0.7, thickness=1, offset=5)
+            # Here we are giving the name and confidence to the object  
+            cvzone.putTextRect(img, f"{current_class} {conf}", (max(0,x1), max(35,y1)),
+                               scale=0.7, thickness=1, offset=5)
 
     cv2.imshow("Image", img)
     cv2.waitKey(1)  
