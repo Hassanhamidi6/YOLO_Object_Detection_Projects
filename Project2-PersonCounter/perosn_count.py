@@ -4,10 +4,9 @@ import cvzone
 import math
 from sort import *
 
-cap = cv2.VideoCapture("Videos/person.mp4")
+cap = cv2.VideoCapture("Videos/people.mp4")
 
-# using  the YOLOv8 model
-model = YOLO("../Yolo-weights/Yolov8n.pt")
+model = YOLO("../Yolo-weights/Yolov8n.pt")    # using  the YOLOv8 model
 
 cap.set(cv2.CAP_PROP_FRAME_WIDTH, 906)
 cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 344)
@@ -17,8 +16,8 @@ cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 344)
 tracker = Sort(max_age=20, min_hits=3, iou_threshold=0.3)
 
 # Line for counting the vehicles
-limitsUp = [0, 600, 320, 600]  # (x1, y1, x2, y2)
-limitsDown = [350, 200, 650, 200]  
+limitsUp = [80, 150, 300, 150]  # (x1, y1, x2, y2)
+limitsDown = [500, 550, 750, 550]  
 
 # Vehicle count tracking
 total_countUp = []
@@ -39,19 +38,24 @@ classNames = [
     "toothbrush"
 ]
 
+# Mask
+# mask = cv2.imread("Project2-PersonCounter\mask.png")      # adding mask
+
 while True:
     success, img = cap.read()
+    # imgRegion= cv2.bitwise_and(img, mask)     # adding mask
     if not success:
         break
 
     # Detect objects
+    # results = model(imgRegion, stream=True)    # adding mask
     results = model(img, stream=True, conf=0.3)
 
     detections = np.empty((0, 5))  # For SORT
 
     for r in results:
         boxes = r.boxes 
-        for box in boxes:
+        for box in boxes:   
             # Bounding box
             x1, y1, x2, y2 = map(int, box.xyxy[0])
 
@@ -62,7 +66,7 @@ while True:
             cls = int(box.cls[0])
             current_class = classNames[cls]
 
-            # Filter for vehicles
+            # Applying filter for Persons
             if current_class == "person" and conf > 0.3:
                 cvzone.cornerRect(img, (x1, y1, x2 - x1, y2 - y1), l=9, rt=2, colorR=(255, 0, 255))
                 # cvzone.putTextRect(img, f"{current_class} {conf}", (max(0, x1), max(35, y1)),
@@ -85,13 +89,31 @@ while True:
         cvzone.putTextRect(img, f"{current_class} {id}", (x1, y1), scale=0.8, thickness=1, offset=3)
         cv2.circle(img, (cx, cy), 5, (255, 0, 255), cv2.FILLED)
 
+        # for up
         if limitsUp[0] < cx < limitsUp[2] and limitsUp[1] - 20 < cy < limitsUp[3] + 20:
             if total_countUp.count(id)==0:
                 total_countUp.append(id)
                 cv2.line(img, (limitsUp[0], limitsUp[1]), (limitsUp[2], limitsUp[3]), (0, 255, 0), 5)
 
-    # Display total count
-    cvzone.putTextRect(img, f"Count: {total_countUp}", (50, 50), scale=1, thickness=2, offset=5)
+        #for down
+        if limitsDown[0] < cx < limitsDown[2] and limitsDown[1] - 20 < cy < limitsDown[3] + 20:
+            if total_countDown.count(id)==0:
+                total_countDown.append(id)
+                cv2.line(img, (limitsDown[0], limitsDown[1]), (limitsDown[2], limitsDown[3]), (0, 255, 0), 5)
+
+    # ===== Display total count as a simple GUI box =====
+    # Background rectangle
+    cv2.rectangle(img, (10, 10), (220, 130), (50, 50, 50), -1)  # dark background
+    cv2.rectangle(img, (10, 10), (220, 130), (255, 255, 255), 2)  # white border
+
+    # Title
+    cv2.putText(img, "People Count", (20, 40), cv2.FONT_HERSHEY_SIMPLEX,0.8, (255, 255, 255), 2)
+
+    # Up count
+    cv2.putText(img, f"Up   : {len(total_countUp)}", (20, 80),cv2.FONT_HERSHEY_SIMPLEX, 0.7, (139, 195, 75), 2)
+
+    # Down count
+    cv2.putText(img, f"Down : {len(total_countDown)}", (20, 110),cv2.FONT_HERSHEY_SIMPLEX, 0.7, (50, 50, 230), 2)
 
     cv2.imshow("Image", img)
     if cv2.waitKey(1) & 0xFF == ord('q'):
@@ -99,3 +121,4 @@ while True:
 
 cap.release()
 cv2.destroyAllWindows()
+ 
