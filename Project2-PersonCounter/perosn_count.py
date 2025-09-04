@@ -4,11 +4,11 @@ import cvzone
 import math
 from sort import *
 
-cap = cv2.VideoCapture("Videos/people.mp4")
+cap = cv2.VideoCapture("Videos/people.mp4") # capturing the video
 
 model = YOLO("../Yolo-weights/Yolov8n.pt")    # using  the YOLOv8 model
 
-cap.set(cv2.CAP_PROP_FRAME_WIDTH, 906)
+cap.set(cv2.CAP_PROP_FRAME_WIDTH, 906)   
 cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 344)
 
 
@@ -38,17 +38,12 @@ classNames = [
     "toothbrush"
 ]
 
-# Mask
-# mask = cv2.imread("Project2-PersonCounter\mask.png")      # adding mask
-
 while True:
     success, img = cap.read()
-    # imgRegion= cv2.bitwise_and(img, mask)     # adding mask
     if not success:
         break
 
     # Detect objects
-    # results = model(imgRegion, stream=True)    # adding mask
     results = model(img, stream=True, conf=0.3)
 
     detections = np.empty((0, 5))  # For SORT
@@ -78,24 +73,24 @@ while True:
     # SORT tracking
     results_tracker = tracker.update(detections)
 
-    # Draw tracking and counting
+    # Draw tracking and counting line 
     cv2.line(img, (limitsUp[0], limitsUp[1]), (limitsUp[2], limitsUp[3]), (0, 0, 255), 5)
     cv2.line(img, (limitsDown[0], limitsDown[1]), (limitsDown[2], limitsDown[3]), (0, 0, 255), 5)
 
     for result in results_tracker:
         x1, y1, x2, y2, id = map(int, result)
-        cx, cy = (x1 + x2) // 2, (y1 + y2) // 2
+        cx, cy = (x1 + x2) // 2, (y1 + y2) // 2   # (centre x and centre y ) centre of the person's rectangle 
 
         cvzone.putTextRect(img, f"{current_class} {id}", (x1, y1), scale=0.8, thickness=1, offset=3)
         cv2.circle(img, (cx, cy), 5, (255, 0, 255), cv2.FILLED)
 
-        # for up
+        # for up count 
         if limitsUp[0] < cx < limitsUp[2] and limitsUp[1] - 20 < cy < limitsUp[3] + 20:
             if total_countUp.count(id)==0:
                 total_countUp.append(id)
                 cv2.line(img, (limitsUp[0], limitsUp[1]), (limitsUp[2], limitsUp[3]), (0, 255, 0), 5)
 
-        #for down
+        #for down count 
         if limitsDown[0] < cx < limitsDown[2] and limitsDown[1] - 20 < cy < limitsDown[3] + 20:
             if total_countDown.count(id)==0:
                 total_countDown.append(id)

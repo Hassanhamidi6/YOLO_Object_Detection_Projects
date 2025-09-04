@@ -3,7 +3,7 @@ import cv2
 import cvzone
 import math
 
-cap = cv2.VideoCapture(r"Videos\cars.mp4")  
+cap = cv2.VideoCapture(0)    
 
 model = YOLO("../Yolo-weights/Yolov8n.pt")
 
@@ -47,5 +47,11 @@ while True:
             cvzone.putTextRect(img, f"{current_class} {conf}", (max(0,x1), max(35,y1)),
                                scale=0.7, thickness=1, offset=5)
 
+
     cv2.imshow("Image", img)
-    cv2.waitKey(1)  
+    if cv2.waitKey(1) & 0xFF == ord('q'):
+        break
+
+cap.release()
+cv2.destroyAllWindows()
+ 

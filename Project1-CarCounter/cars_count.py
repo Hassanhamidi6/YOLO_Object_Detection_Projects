@@ -9,7 +9,7 @@ cap = cv2.VideoCapture("Videos/cars.mp4")
 # using  the YOLOv8 model
 model = YOLO("../Yolo-weights/Yolov8n.pt")
 
-cap.set(cv2.CAP_PROP_FRAME_WIDTH, 906)
+cap.set(cv2.CAP_PROP_FRAME_WIDTH, 906)     # setting the video size 
 cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 344)
 
 
@@ -78,16 +78,16 @@ while True:
 
     for result in results_tracker:
         x1, y1, x2, y2, id = map(int, result)
-        cx, cy = (x1 + x2) // 2, (y1 + y2) // 2
+        cx, cy = (x1 + x2) // 2, (y1 + y2) // 2    # (centre x and centre y ) centre of the car rectangle
 
         cvzone.putTextRect(img, f"{current_class} {id}", (x1, y1), scale=0.8, thickness=1, offset=3)
         cv2.circle(img, (cx, cy), 5, (255, 0, 255), cv2.FILLED)
 
-        if limits[0] < cx < limits[2] and limits[1] - 20 < cy < limits[3] + 20:
-            if id not in counted_ids:
+        if limits[0] < cx < limits[2] and limits[1] - 20 < cy < limits[3] + 20:  
+            if id not in counted_ids:                # counting the unique cars when cross the line 
                 counted_ids.add(id)
                 total_count += 1
-                cv2.line(img, (limits[0], limits[1]), (limits[2], limits[3]), (0, 255, 0), 5)
+                cv2.line(img, (limits[0], limits[1]), (limits[2], limits[3]), (0, 255, 0), 5) # changing line color when car detected 
 
     # Display total count
     cvzone.putTextRect(img, f"Count: {total_count}", (50, 50), scale=1, thickness=2, offset=5)

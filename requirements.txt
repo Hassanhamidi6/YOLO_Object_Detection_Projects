@@ -1,10 +1,10 @@
-cvzone
 ultralytics 
-hydra-core 
-matplotlib 
-numpy
 opencv-python
 Pillow 
+cvzone
+matplotlib 
+numpy
+hydra-core 
 requests
 PyYAML
 scipy
@@ -14,3 +14,14 @@ tqdm
 filterpy
 scikit-image 
 lap
+easyocr
+labelImg   # for labeling the images    
+label-studio   # for labeling the images    
+pyqt5==5.15.2    
+
+
+
+
+
+# car dataset path
+# https://universe.roboflow.com/alpr-qggma/alpr-akctv/datase 
