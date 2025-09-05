@@ -10,7 +10,7 @@ Both projects give every detected object a **unique identity**, track it across 
 
 ### 1️⃣ Car Counter 🚗
 
-![App Screenshot](Project1-CarCounter\screenshot.PNG)
+![App Screenshot](Project1-CarCounter/screenshot.PNG)
 
 - Detects and tracks cars in a video stream  
 - Each car is assigned a **unique ID**  
@@ -23,7 +23,7 @@ Both projects give every detected object a **unique identity**, track it across 
 
 ### 2️⃣ Person Counter 🧑‍🤝‍🧑
 
-![App Screenshot](Project2-PersonCounter\screenshot.PNG)
+![App Screenshot](Project2-PersonCounter/screenshot.PNG)
 
 - Detects and tracks people in real-time  
 - Each person gets a **unique ID**  
