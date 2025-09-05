@@ -58,7 +58,5 @@ Both projects give every detected object a **unique identity**, track it across 
 - **SORT (Simple Online and Realtime Tracking)** for tracking  
 - **OpenCV** for video processing  
 
----
 
-## 📸 Example Output (Concept)
 
